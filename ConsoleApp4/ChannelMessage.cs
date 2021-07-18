@@ -1,8 +1,11 @@
 ﻿namespace ConsoleApp4
 {
-    class ChannelMessage
+    class ChannelMessage : RegularMessage
     {
-        public Channel Channel { get; set; }
-        public Message Message { get; set; }
+        public ChannelMessage(string body, string sender, string channel) : base(body, sender)
+        {
+            Channel = channel;
+        }
+        public string Channel { get; private set; }
     }
 }

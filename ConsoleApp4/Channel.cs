@@ -2,29 +2,32 @@
 
 namespace ConsoleApp4
 {
-    class Channel
+    class Channel : IMessageReceiver
     {
         public string Name { get; set; }
         public List<Person> Members { get; set; }
-        public List<Message> Messages { get; set; }
+        public List<RegularMessage> Messages { get; set; }
 
         public Channel()
         {
             Members = new List<Person>();
-            Messages = new List<Message>();
+            Messages = new List<RegularMessage>();
         }
        
 
-        public void NotifyMembers(Message message)
+        private void NotifyMembers(RegularMessage message)
         {
             foreach (var member in Members)
             {
-                if(member != message.Sender)
-                    member.ReceiveChannelMessage(new ChannelMessage { Channel = this, Message = message });
+                if(member.Name != message.Sender)
+                {
+                    var channelMessage = new ChannelMessage(message.Body, message.Sender, this.Name);
+                    member.ReceiveChannelMessage(channelMessage);
+                }
             }
         }
 
-        public void AddMessage(Message message)
+        public void ReceiveMessage(RegularMessage message)
         {
             Messages.Add(message);
             NotifyMembers(message);

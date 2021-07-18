@@ -22,12 +22,12 @@ namespace ConsoleApp4
             p1.SendMessageToChannel("Hello, everyone!", "CApRe");
             p1.SendMessageToChannel("ce faceti?", "CApRe");
 
-            var messages = p2.ReadMessagesFromChannel("CApRe");
+            //var messages = p2.ReadMessagesFromChannel("CApRe");
 
-            foreach (var message in messages)
-            {
-                Console.WriteLine($"{message.Sender.Name}: {message.Body}");
-            }
+            //foreach (var message in messages)
+            //{
+            //    Console.WriteLine($"{message.Sender}: {message.Body}");
+            //}
         }
     }
 }

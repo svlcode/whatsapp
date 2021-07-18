@@ -5,50 +5,64 @@ using System.Text;
 
 namespace ConsoleApp4
 {
-    class Person
+    class Person : IMessageReceiver
     {
         public string Name { get; set; }
-        public List<Channel> MyChannels { get; set; }
-        public List<Person> MyFriends { get; set; }
-        private List<ChannelMessage> UnreadChannelMessages { get; set; }
-        private List<ChannelMessage> ReadChannelMessages { get; set; }
+        private List<Channel> _myChannels;
+        private List<Person> _myFriends;
+
 
         public Person()
         {
-            MyChannels = new List<Channel>();
-
-            UnreadChannelMessages = new List<ChannelMessage>();
-            ReadChannelMessages = new List<ChannelMessage>();
+            _myChannels = new List<Channel>();
+            _myFriends = new List<Person>();
         }
 
         public void RegisterChannel(Channel channel)
         {
-            MyChannels.Add(channel);
+            _myChannels.Add(channel);
             channel.Register(this);
+        }
+
+        public void AddFriend(Person friend)
+        {
+            _myFriends.Add(friend);
         }
 
         public void ReceiveChannelMessage(ChannelMessage channelMessage)
         {
-            UnreadChannelMessages.Add(channelMessage);
+            Console.WriteLine($"{channelMessage.Channel}:{channelMessage.Sender}: {channelMessage.Body}");
         }
 
-        public IEnumerable<Message> ReadMessagesFromChannel(string channelName)
+        public void SendMessageToFriend(string message, string friendName)
         {
-            var channelMessages = this.UnreadChannelMessages
-                .Where(cm => cm.Channel.Name == channelName).ToList();
+            var friend = _myFriends.FirstOrDefault(f => f.Name == friendName);
+            if(friend != null)
+            {
+                friend.ReceiveMessage(new RegularMessage(message, Name));
+            }
+            else
+            {
+                Console.WriteLine($"Cannot send message! The person {friendName} is not a friend.");
+            }
+        }
 
-            ReadChannelMessages.AddRange(channelMessages);
-            UnreadChannelMessages.RemoveAll(cm => cm.Channel.Name == channelName);
-            
-            var messages = channelMessages.Select(cm => cm.Message);
-
-            return messages;
+        public void ReceiveMessage(RegularMessage message)
+        {
+            Console.WriteLine($"{message.Sender}: {message.Body}");
         }
 
         public void SendMessageToChannel(string message, string channelName)
         {
-            var channel = MyChannels.FirstOrDefault(ch => ch.Name == channelName);
-            channel.AddMessage(new Message { Body = message, Sender = this });
+            var channel = _myChannels.FirstOrDefault(ch => ch.Name == channelName);
+            if(channel != null)
+            {
+                channel.ReceiveMessage(new RegularMessage(message, Name));
+            }
+            else
+            {
+                Console.WriteLine($"Cannot send message! You are not registered to the channel {channelName}");
+            }
         }
     }
 }
